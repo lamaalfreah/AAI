@@ -27,23 +27,20 @@ Exercises:
 
 Learning outcomes:
 
-1. What kind of data does pandas handle?
-2. How do I read and write tabular data?
-3. How do I select a subset of a DataFrame?
-4. How do I create plots in pandas?
-5. How to create new columns derived from existing columns
-6. How to calculate summary statistics
-7. How to reshape the layout of tables
-8. How to combine data from multiple tables
-9. How to handle time series data with ease
-10. How to manipulate textual data
-11. How to apply functions to rows, columns, and tables?
+1. Explain the roles of `DataFrame` and `Series` in pandas and inspect basic metadata (`head`, `tail`, `info`, `dtypes`, `index`, `columns`)
+2. Load tabular data into pandas from local files and URLs, and construct a `DataFrame` from Python data structures
+3. Select and filter data using column selection, boolean masks, combined conditions, and label/position indexing with `loc` and `iloc`
+4. Create and transform columns using vectorized operations, including deriving new columns, dropping columns, and renaming columns
+5. Compute descriptive statistics with methods such as `mean`, `median`, `describe`, and `agg`, while interpreting grouped summaries
+6. Aggregate data by one or more categories using `groupby` and count category frequencies with `value_counts`
+7. Apply custom functions table-wise, row/column-wise, and element-wise using `pipe`, `apply`, and `map`
 
 Lessons and labs:
 
-1. [Pandas](./M2/lessons/01_pandas.ipynb) (external links)
-2. [Lab 1: Bike Sharing](./M2/lessons/02_lab_bike_sharing.ipynb)
-3. [Lab 2: Pandas' Function application](./M2/lessons/03_pandas_function_application.ipynb)
+1. [Lab: Pandas Essentials](./M2/lessons/01_pd_dataframe.ipynb)
+2. [Lab: Pandas Summary Statistics](./M2/lessons/02_pd_agg.ipynb)
+3. [Lab: Pandas Function application](./M2/lessons/03_pd_function_application.ipynb)
+4. [Lab: Bike Sharing](./M2/lessons/04_lab_bike_sharing.ipynb)
 
 Exercises:
 
