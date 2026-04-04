@@ -1,0 +1,23 @@
+---
+title: Introduction
+format: html
+---
+
+## Understanding NLP and LLMs
+
+While this course was originally focused on NLP (Natural Language Processing), it has evolved to emphasize Large Language Models (LLMs), which represent the latest advancement in the field. 
+
+**What's the difference?**
+
+- **NLP (Natural Language Processing)** is the broader field focused on enabling computers to understand, interpret, and generate human language. NLP encompasses many techniques and tasks such as sentiment analysis, named entity recognition, and machine translation.
+- **LLMs (Large Language Models)** are a powerful subset of NLP models characterized by their massive size, extensive training data, and ability to perform a wide range of language tasks with minimal task-specific training. Models like the Llama, GPT, or Claude series are examples of LLMs that have revolutionized what's possible in NLP.
+
+Throughout this course, you'll learn about both traditional NLP concepts and cutting-edge LLM techniques, as understanding the foundations of NLP is crucial for working effectively with LLMs.
+
+## Learning Objectives
+
+In this chapter, you will learn:
+
+* How to use the `pipeline()` function to solve NLP tasks such as text generation and classification
+* About the Transformer architecture
+* How to distinguish between encoder, decoder, and encoder-decoder architectures and use cases

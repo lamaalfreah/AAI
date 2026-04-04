@@ -1,0 +1,182 @@
+---
+title: "Deep dive into Text Generation Inference with LLMs"
+format: html
+---
+
+## Understanding the Basics
+
+Let's start with the fundamentals. Inference is the process of using a trained LLM to generate human-like text from a given input prompt. Language models use their knowledge from training to formulate responses one word at a time. The model leverages learned probabilities from billions of parameters to predict and generate the next token in a sequence.
+
+## The Role of Attention
+
+The attention mechanism is what gives LLMs their ability to understand context and generate coherent responses. When predicting the next word, not every word in a sentence carries equal weight. This ability to focus on relevant information is what we call attention.
+
+This process of identifying the most relevant words to predict the next token has proven to be incredibly effective.
+
+## Context Length and Attention Span
+
+The context length refers to the maximum number of tokens (words or parts of words) that the LLM can process at once. Think of it as the size of the model's working memory.
+
+These capabilities are limited by several practical factors:
+
+- The model's architecture and size
+- Available computational resources
+- The complexity of the input and desired output
+
+## The Art of Prompting
+
+When we pass information to LLMs, we structure our input in a way that guides the generation of the LLM toward the desired output. This is called _prompting_.
+
+Understanding how LLMs process information helps us craft better prompts. Since the model's primary task is to predict the next token by analyzing the importance of each input token, the wording of your input sequence becomes crucial.
+
+## The Two-Phase Inference Process: Prefill
+
+The process can be broken down into two main phases: prefill and decode.
+
+The prefill phase involves three key steps:
+
+1. **Tokenization**: Converting the input text into tokens
+2. **Embedding Conversion**: Transforming these tokens into numerical representations
+3. **Initial Processing**: Running these embeddings through the model's neural networks to create a rich understanding of the context
+
+This phase is computationally intensive because it needs to process all input tokens at once. Think of it as reading and understanding an entire paragraph before starting to write a response.
+
+You can experiment with different tokenizers in the interactive playground below:
+
+<iframe
+	src="https://agents-course-the-tokenizer-playground.static.hf.space"
+	frameborder="0"
+	width="850"
+	height="450"
+></iframe>
+
+## The Two-Phase Inference Process: Decode
+
+After the prefill phase, we move to the decode phase - where textual generation happens. The model generates one token at a time autoregressively.
+
+The decode phase involves several key steps that happen for each new token:
+
+1. **Attention Computation**: Looking back at all previous tokens to understand context
+2. **Probability Calculation**: Determining the likelihood of each possible next token
+3. **Token Selection**: Choosing the next token based on these probabilities
+4. **Continuation Check**: Deciding whether to continue or stop generation
+
+## Sampling Strategies
+
+When the model needs to choose the next token, it starts with raw probabilities (logits).
+
+1. **Temperature Control**: Like a creativity dial - higher settings (>1.0) make choices more random and creative, lower settings (<1.0) make them more deterministic.
+2. **Top-p (Nucleus) Sampling**: We only look at the most likely ones that add up to our chosen probability threshold.
+3. **Top-k Filtering**: We only consider the k most likely next words.
+
+You can interact with the basic decoding process yourself with SmolLM2 in this Space (remember, it decodes until reaching an **EOS** token which is  **<|im_end|>** for this model):
+
+<iframe
+	src="https://agents-course-decoding-visualizer.hf.space"
+	frameborder="0"
+	width="850"
+	height="450"
+></iframe>
+
+## Understanding Token Selection: From Probabilities to Token Choices
+
+When the model needs to choose the next token, it starts with raw probabilities (called logits) for every word in its vocabulary. But how do we turn these probabilities into actual choices? Let's break down the process:
+
+![image](https://huggingface.co/reasoning-course/images/resolve/main/inference/1.png)  
+
+1. **Raw Logits**: Think of these as the model's initial gut feelings about each possible next word
+2. **Temperature Control**: Like a creativity dial - higher settings (>1.0) make choices more random and creative, lower settings (<1.0) make them more focused and deterministic
+3. **Top-p (Nucleus) Sampling**: Instead of considering all possible words, we only look at the most likely ones that add up to our chosen probability threshold (e.g., top 90%)
+4. **Top-k Filtering**: An alternative approach where we only consider the k most likely next words
+
+## Managing Repetition: Keeping Output Fresh
+
+One common challenge with LLMs is their tendency to repeat themselves. To address this:
+
+1. **Presence Penalty**: A fixed penalty applied to any token that has appeared before.
+2. **Frequency Penalty**: A scaling penalty that increases based on how often a token has been used.
+
+These penalties are applied early in the token selection process, adjusting the raw probabilities before other sampling strategies are applied. Think of them as gentle nudges encouraging the model to explore new vocabulary.
+
+## Controlling Generation Length: Setting Boundaries
+
+We can control generation length in several ways:
+1. **Token Limits**: Setting minimum and maximum token counts
+2. **Stop Sequences**: Defining specific patterns that signal the end of generation
+3. **End-of-Sequence Detection**: Letting the model naturally conclude its response
+
+For example, if we want to generate a single paragraph, we might set a maximum of 100 tokens and use "\n\n" as a stop sequence. This ensures our output stays focused and appropriately sized for its purpose.
+
+![image](https://huggingface.co/reasoning-course/images/resolve/main/inference/3.png)  
+
+## Beam Search: Looking Ahead for Better Coherence
+
+While the strategies discussed so far make decisions one token at a time, beam search takes a more holistic approach. Instead of committing to a single choice, it explores multiple possible paths simultaneously.
+
+![image](https://huggingface.co/reasoning-course/images/resolve/main/inference/4.png)
+
+Here's how it works:
+
+1. At each step, maintain multiple candidate sequences (typically 5-10)
+2. For each candidate, compute probabilities for the next token
+3. Keep only the most promising combinations of sequences and next tokens
+4. Continue this process until reaching the desired length or stop condition
+5. Select the sequence with the highest overall probability
+
+You can explore beam search visually here:
+
+<iframe
+	src="https://agents-course-beam-search-visualizer.hf.space"
+	frameborder="0"
+	width="850"
+	height="450"
+></iframe>
+
+This approach often produces more coherent and grammatically correct text, though it requires more computational resources than simpler methods.
+
+## Practical Challenges and Optimization
+
+As we wrap up our exploration of LLM inference, let's look at the practical challenges you'll face when deploying these models, and how to measure and optimize their performance.
+
+
+### Key Performance Metrics
+
+When working with LLMs, four critical metrics will shape your implementation decisions:
+
+1. **Time to First Token (TTFT)**: How quickly can you get the first response? This is crucial for user experience and is primarily affected by the prefill phase.
+2. **Time Per Output Token (TPOT)**: How fast can you generate subsequent tokens? This determines the overall generation speed.
+3. **Throughput**: How many requests can you handle simultaneously? This affects scaling and cost efficiency.
+4. **VRAM Usage**: How much GPU memory do you need? This often becomes the primary constraint in real-world applications.
+
+### The Context Length Challenge
+
+One of the most significant challenges in LLM inference is managing context length effectively. Longer contexts provide more information but come with substantial costs:
+
+- **Memory Usage**: Grows quadratically with context length
+- **Processing Speed**: Decreases linearly with longer contexts
+- **Resource Allocation**: Requires careful balancing of VRAM usage
+
+Recent models like [Qwen2.5-1M](https://huggingface.co/Qwen/Qwen2.5-14B-Instruct-1M) offer impressive 1M token context windows, but this comes at the cost of significantly slower inference times. The key is finding the right balance for your specific use case.  
+
+
+### The KV Cache Optimization
+
+To address these challenges, one of the most powerful optimizations is KV (Key-Value) caching. This technique significantly improves inference speed by storing and reusing intermediate calculations. This optimization:
+- Reduces repeated calculations
+- Improves generation speed
+- Makes long-context generation practical
+
+The trade-off is additional memory usage, but the performance benefits usually far outweigh this cost.
+
+## Conclusion
+
+Understanding LLM inference is crucial for effectively deploying and optimizing these powerful models. We've covered the key components:
+
+- The fundamental role of attention and context
+- The two-phase inference process
+- Various sampling strategies for controlling generation
+- Practical challenges and optimizations
+
+By mastering these concepts, you'll be better equipped to build applications that leverage LLMs effectively and efficiently.
+
+Remember that the field of LLM inference is rapidly evolving, with new techniques and optimizations emerging regularly. Stay curious and keep experimenting with different approaches to find what works best for your specific use cases.
